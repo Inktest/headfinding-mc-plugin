@@ -1,0 +1,9 @@
+name: Heads
+main: heads.inktest.Main
+author: Inktest
+version: 0.1
+api-version: 1.16
+commands:
+   heads:
+      description: Command for heads lol
+      usage: /heads [giveheads/start/stop]
