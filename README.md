@@ -12,7 +12,7 @@ Once a player breaks a head, it shows in chat who broke the head and who's head 
 
 /heads start -- Starts the tracking of heads
 
-/heads stop -- Stops the tracking of heads and clears the scoreboard
+/heads count -- Shows the score of each player
 
 ```
 

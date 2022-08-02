@@ -1,6 +1,9 @@
 package heads.inktest;
 
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,6 +25,8 @@ public class Main extends JavaPlugin implements Listener {
 
 	
 	public static boolean round;
+	public static Map<String,Integer> count = new HashMap<String,Integer>();
+	public static Map<String,Boolean> bcount = new HashMap<String,Boolean>();
 	
 	@Override
 	public void onEnable( ) {
@@ -38,11 +43,23 @@ public class Main extends JavaPlugin implements Listener {
 		Skull skull = (Skull) block.getState();
 		@SuppressWarnings("deprecation")
 		String name = skull.getOwner()==null?"Steve":skull.getOwner();
+		String bname = event.getPlayer().getName();
+		Bukkit.broadcastMessage(ChatColor.YELLOW + bname + " has found " + name + "'s head!");
+		if (count.get(bname) == null) {
+			count.put(bname,0);
+			bcount.put(bname, true);
+		}
+		if (count.get(name) == null) {
+			count.put(name,0);
+			bcount.put(name, true);
+		}
 		
-		Bukkit.broadcastMessage(ChatColor.YELLOW + event.getPlayer().getName() + " has found " + name + "'s head!");
-		
-		getServer().dispatchCommand(getServer().getConsoleSender(), "scoreboard players add "+event.getPlayer().getName()+" headsbroken 1");
-		getServer().dispatchCommand(getServer().getConsoleSender(), "scoreboard players remove " + name + " headsbroken 1");
+		Integer current = count.get(bname);
+		current += 1;
+		count.put(bname, current);
+		Boolean bcurrent = bcount.get(name);
+		bcurrent = false;
+		bcount.put(name, bcurrent);
 		
 	}
 	
@@ -55,7 +72,7 @@ public class Main extends JavaPlugin implements Listener {
 			return true;
 		}
 		if (args.length == 0) {
-			sender.sendMessage(ChatColor.RED + "Usage: /heads [giveheads/start/stop]");
+			sender.sendMessage(ChatColor.RED + "Usage: /heads [giveheads/start/count]");
 			return true;
 		}
 		
@@ -72,18 +89,24 @@ public class Main extends JavaPlugin implements Listener {
 			break;
 		case "start":
 			round = true;
-			
-			getServer().dispatchCommand(getServer().getConsoleSender(), "scoreboard objectives remove headsbroken");
-			getServer().dispatchCommand(getServer().getConsoleSender(), "scoreboard objectives add headsbroken dummy \"POINTS\"");
-			getServer().dispatchCommand(getServer().getConsoleSender(), "scoreboard players set @a headsbroken 1");
-			getServer().dispatchCommand(getServer().getConsoleSender(), "scoreboard objectives setdisplay sidebar headsbroken");
+			count.clear();
 			break;
-		case "stop":
-			round = false;
-			getServer().dispatchCommand(getServer().getConsoleSender(), "scoreboard objectives remove headsbroken");
+		case "count":
+			Map<String,Integer> parsed = new HashMap<String,Integer>();
+			for (Map.Entry<String, Integer> set : count.entrySet()) {			
+				 parsed.put(set.getKey(), set.getValue()+(bcount.get(set.getKey())?1:0));
+			 }
+			Map<String,Integer> sorted = new TreeMap<>(parsed);
+			sender.sendMessage(ChatColor.RED + ""+ ChatColor.BOLD + "## Points ##");
+			sender.sendMessage("");
+			for (Map.Entry<String, Integer> set : sorted.entrySet()) {			
+				 sender.sendMessage(ChatColor.RED + set.getKey() + " - " + count.get(set.getKey()) 
+				 +(bcount.get(set.getKey())?ChatColor.GREEN + " (+1)":ChatColor.RED + " (+0)")
+				 );
+			 }
 			break;
 		default:
-			sender.sendMessage(ChatColor.RED + "Usage: /heads [giveheads/start/stop]");
+			sender.sendMessage(ChatColor.RED + "Usage: /heads [giveheads/start/count]");
 			break;
 		}
 		return true;
