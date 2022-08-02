@@ -36,11 +36,13 @@ public class Main extends JavaPlugin implements Listener {
 		Block block = event.getBlock();
 		if (block.getType() != Material.PLAYER_HEAD && block.getType() != Material.PLAYER_WALL_HEAD) return;
 		Skull skull = (Skull) block.getState();
+		@SuppressWarnings("deprecation")
+		String name = skull.getOwner()==null?"Steve":skull.getOwner();
 		
-		Bukkit.broadcastMessage(ChatColor.YELLOW + event.getPlayer().getName() + " has found " + skull.getOwner() + "'s head!");
-
+		Bukkit.broadcastMessage(ChatColor.YELLOW + event.getPlayer().getName() + " has found " + name + "'s head!");
+		
 		getServer().dispatchCommand(getServer().getConsoleSender(), "scoreboard players add "+event.getPlayer().getName()+" headsbroken 1");
-		getServer().dispatchCommand(getServer().getConsoleSender(), "scoreboard players remove "+skull.getOwner()+" headsbroken 1");
+		getServer().dispatchCommand(getServer().getConsoleSender(), "scoreboard players remove " + name + " headsbroken 1");
 		
 	}
 	

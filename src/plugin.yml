@@ -1,7 +1,7 @@
 name: Heads
 main: heads.inktest.Main
 author: Inktest
-version: 0.1
+version: 0.1.1
 api-version: 1.16
 commands:
    heads:
