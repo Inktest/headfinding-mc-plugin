@@ -72,7 +72,7 @@ public class Main extends JavaPlugin implements Listener {
 			return true;
 		}
 		if (args.length == 0) {
-			sender.sendMessage(ChatColor.RED + "Usage: /heads [giveheads/start/count]");
+			sender.sendMessage(ChatColor.RED + "Usage: /heads [giveheads/start/stop/count]");
 			return true;
 		}
 		
@@ -90,6 +90,10 @@ public class Main extends JavaPlugin implements Listener {
 		case "start":
 			round = true;
 			count.clear();
+			bcount.clear();
+			break;
+		case "stop":
+			round = false;
 			break;
 		case "count":
 			Map<String,Integer> parsed = new HashMap<String,Integer>();
@@ -106,7 +110,7 @@ public class Main extends JavaPlugin implements Listener {
 			 }
 			break;
 		default:
-			sender.sendMessage(ChatColor.RED + "Usage: /heads [giveheads/start/count]");
+			sender.sendMessage(ChatColor.RED + "Usage: /heads [giveheads/start/stop/count]");
 			break;
 		}
 		return true;
