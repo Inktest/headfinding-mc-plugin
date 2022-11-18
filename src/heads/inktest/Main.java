@@ -41,6 +41,7 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@EventHandler
 	public void blockPlace(BlockPlaceEvent event) {
+		if (!(round)) return;
 		ItemStack item = event.getItemInHand();
 		if (item.getType() == Material.PLAYER_HEAD && item.getItemMeta().getLore().contains(ChatColor.GRAY + "Hide your head as best you can from other players!")) {
 			headsLoc.put(event.getBlock().getLocation(), event.getPlayer().getName());
