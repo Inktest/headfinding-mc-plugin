@@ -4,6 +4,6 @@ author: Inktest
 version: 0.3
 api-version: 1.16
 commands:
-   heads:
+   headfinding:
       description: Command for heads lol
       usage: /heads [giveheads/start/count/stop]
