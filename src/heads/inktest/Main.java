@@ -56,7 +56,7 @@ public class Main extends JavaPlugin implements Listener {
 		String name = headsLoc.get(blockLoc);
 		String bname = event.getPlayer().getName();
 		if (name == null) return;
-		if (name == bname) {
+		if (name.equals(bname)) {
 			event.getPlayer().sendMessage(ChatColor.RED + "You cannot break your own head!");
 			event.setCancelled(true);
 			return;
