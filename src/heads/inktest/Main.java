@@ -1,19 +1,22 @@
 package heads.inktest;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Skull;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,6 +30,7 @@ public class Main extends JavaPlugin implements Listener {
 	public static boolean round;
 	public static Map<String,Integer> count = new HashMap<String,Integer>();
 	public static Map<String,Boolean> bcount = new HashMap<String,Boolean>();
+	public static Map<Location, String> headsLoc = new HashMap<Location, String>();
 	
 	@Override
 	public void onEnable( ) {
@@ -36,14 +40,28 @@ public class Main extends JavaPlugin implements Listener {
 	}
 	
 	@EventHandler
+	public void blockPlace(BlockPlaceEvent event) {
+		ItemStack item = event.getItemInHand();
+		if (item.getType() == Material.PLAYER_HEAD && item.getItemMeta().getLore().contains(ChatColor.GRAY + "Hide your head as best you can from other players!")) {
+			headsLoc.put(event.getBlock().getLocation(), event.getPlayer().getName());
+		}
+	}
+	
+	@EventHandler
 	public void blockBreak(BlockBreakEvent event) {
 		if (!(round)) return;
 		Block block = event.getBlock();
-		if (block.getType() != Material.PLAYER_HEAD && block.getType() != Material.PLAYER_WALL_HEAD) return;
-		Skull skull = (Skull) block.getState();
-		@SuppressWarnings("deprecation")
-		String name = skull.getOwner()==null?"Steve":skull.getOwner();
+		Location blockLoc = block.getLocation();
+		String name = headsLoc.get(blockLoc);
+		System.out.println(name);
 		String bname = event.getPlayer().getName();
+		if (name == null) return;
+		if (name == bname) {
+			event.getPlayer().sendMessage(ChatColor.RED + "You cannot break your own head!");
+			event.setCancelled(true);
+			return;
+			}
+		if (block.getType() != Material.PLAYER_HEAD && block.getType() != Material.PLAYER_WALL_HEAD) return;
 		Bukkit.broadcastMessage(ChatColor.YELLOW + bname + " has found " + name + "'s head!");
 		if (count.get(bname) == null) {
 			count.put(bname,0);
@@ -61,6 +79,7 @@ public class Main extends JavaPlugin implements Listener {
 		bcurrent = false;
 		bcount.put(name, bcurrent);
 		
+		headsLoc.remove(blockLoc);
 	}
 	
 	
@@ -83,17 +102,27 @@ public class Main extends JavaPlugin implements Listener {
 			    ItemStack head = new ItemStack(Material.PLAYER_HEAD);
 			    SkullMeta meta = (SkullMeta) head.getItemMeta();
 			    meta.setOwningPlayer(player);
+			    List<String> lore = new ArrayList<String>();
+			    lore.add(ChatColor.GRAY + "Hide your head as best you can from other players!");
+			    meta.setLore(lore);
 			    head.setItemMeta(meta);
-			    player.getInventory().addItem(head);
+			    player.getInventory().addItem(head);		    
 			}
+			sender.sendMessage(ChatColor.YELLOW + "Heads given to all players!");
 			break;
 		case "start":
 			round = true;
 			count.clear();
 			bcount.clear();
+			sender.sendMessage(ChatColor.YELLOW + "Round started!");
 			break;
 		case "stop":
 			round = false;
+			for (Map.Entry<Location, String> set : headsLoc.entrySet()) {
+				set.getKey().getBlock().setType(Material.AIR);
+			}
+			headsLoc.clear();
+			sender.sendMessage(ChatColor.YELLOW + "Stopped round!");
 			break;
 		case "count":
 			Map<String,Integer> parsed = new HashMap<String,Integer>();
