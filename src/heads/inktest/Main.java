@@ -54,7 +54,6 @@ public class Main extends JavaPlugin implements Listener {
 		Block block = event.getBlock();
 		Location blockLoc = block.getLocation();
 		String name = headsLoc.get(blockLoc);
-		System.out.println(name);
 		String bname = event.getPlayer().getName();
 		if (name == null) return;
 		if (name == bname) {
